@@ -1,0 +1,11 @@
+warning: in the working copy of 'CHECKPOINT.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/ARCHITECTURE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/emporio/cli.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'start_windows.bat', LF will be replaced by CRLF the next time Git touches it
+ CHECKPOINT.md        |  91 [32m+++++++++++++++[m[31m-----------[m
+ README.md            | 181 [32m+++++++++++++++++++[m[31m--------------------------------[m
+ docs/ARCHITECTURE.md |   8 [32m+++[m
+ src/emporio/cli.py   |  10 [32m+++[m
+ start_windows.bat    |   4 [32m+[m[31m-[m
+ 5 files changed, 138 insertions(+), 156 deletions(-)

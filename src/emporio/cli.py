@@ -32,7 +32,17 @@ def main() -> None:
     policy = subcommands.add_parser('policy', aliases=['politica'], help='Retrieve policy pages')
     policy.set_defaults(action='policy')
     policy.add_argument('query')
+    chat = subcommands.add_parser('chat', help='Start the deterministic offline assistant')
+    chat.set_defaults(action='chat')
+    chat.add_argument('--mode', choices=['offline'], default='offline')
+    chat.add_argument('--demo-customer-id', type=int, help='Simulated local identity; not authentication')
     args = parser.parse_args()
+    if args.action == 'chat':
+        from .chat import run_chat
+        if args.demo_customer_id is not None and args.demo_customer_id <= 0:
+            parser.error('--demo-customer-id must be positive')
+        run_chat(args.data, args.demo_customer_id)
+        return
 
     if args.action == 'policy':
         result = Policies(args.data).search(args.query)

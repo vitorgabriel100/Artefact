@@ -40,3 +40,11 @@ Invalid relationships fail ingestion. Missing products return `None`. Unknown po
 topics return no matching pages. A changed PDF invalidates its index. CLI exceptions
 currently surface as developer errors; conversational recovery belongs to later stages.
 The existing order tool filters ownership in SQL and closes its database per call.
+
+## Checkpoint 03 implementation update
+
+`chat.py` now implements the planned offline router and bounded selection context.
+It calls ToolBox and renders exact price strings or reviewed policy templates after
+retrieving the source page. The chat command supports exit, EOF and Ctrl+C.
+The earlier intended-path section records the pre-chat design; offline routing is
+now implemented, while LLM integration and production authentication remain pending.

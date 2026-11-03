@@ -6,6 +6,6 @@ if not exist .venv\Scripts\python.exe (
     pause
     exit /b 1
 )
-echo Checkpoint 01: deterministic catalog tools. Interactive chat is not implemented yet.
-.venv\Scripts\python.exe -m emporio.cli --help
+echo Starting the offline assistant.
+.venv\Scripts\python.exe -m emporio.cli chat --mode offline
 pause

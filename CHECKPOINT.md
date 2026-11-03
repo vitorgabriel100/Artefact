@@ -1,56 +1,69 @@
-# Checkpoint 02 — Operational services
+# Checkpoint 03 — Offline conversational assistant
 
-## Changes
+## Implemented
 
-Hardened `src/emporio/tools.py`: reject invalid session identities, blank queries,
-non-finite or negative budgets before querying. Existing allowed tools, pricing,
-policy retrieval and session-scoped order implementation are preserved.
-Added `tests/test_tools.py` with 11 operational tests. Previous 19 tests unchanged.
-Updated README and architecture status. Archived previous report in docs/CHECKPOINT_01.md.
-No files removed, new dependencies, commits or pushes. Existing local branch: main;
-uncommitted checkpoint-01 changes were preserved.
+Added `src/emporio/chat.py`: deterministic intent routing, readable product prices,
+policy translations with retrieved page references, session product selection and
+last accessible order. Added chat CLI mode and an explicitly simulated customer flag.
+Updated `start_windows.bat` to launch chat. Added `tests/test_chat.py` (10 tests).
+Updated README and architecture. Archived checkpoint 02 in docs/CHECKPOINT_02.md.
+Existing source records and previous 30 tests remain unchanged. No new dependencies.
 
-## Actual verification
+## Actual validation
 
-`python -m unittest discover -s tests -v`: 30 tests, OK on Linux/Python 3.12.
-Tests cover owned orders, unknown orders, wrong ownership, missing identity,
-identity injection, missing shipping values, invalid arguments, exact product prices,
-availability, policy sources and related pages. All original tests remain passing.
+`python -m unittest discover -s tests -v`: 40 tests, OK, Linux/Python 3.12.
+Tests cover budget search, ambiguous references, first-product selection, PIX follow-up,
+specific/missing models, discontinued stock, policy topics and page references,
+combined order/return requests, order isolation, unsupported requests, input limits,
+and a real CLI subprocess greeting/exit. An initial missing accessories routing term
+was found by the suite and fixed before delivery. Windows execution remains pending.
 
-## Privacy and demonstration boundary
-
-Customer ID is supplied by the application session, never a tool argument.
-Unknown and unauthorized orders produce identical results. No customer email, phone,
-address or internal notes are returned. This is authorization filtering, not real
-identity authentication. The later local demo may assign a clearly labeled fictional
-session; public production deployment requires actual authentication.
-
-## Limitations
-
-No conversational interface or LLM yet. No actual receipt date or purchase channel
-exists in the supplied orders. Missing tracking and delivery remain null. Data is a
-local snapshot, not live inventory. General schema/date validation and broader lexical
-retrieval evaluation remain improvements; no policy eligibility approval is implemented.
-
-## Apply and validate
-
-Extract the complete ZIP directly into C:\Artefact\artefact-emporio.
-It has no enclosing directory or .git, .env, virtual environment or nested archives.
-No cleanup is required. Preserve local modifications before replacing matching files.
+## Usage
 
 ```bat
 cd /d C:\Artefact\artefact-emporio
 python -m pip install -e .
 python -m unittest discover -s tests -v
+python -m emporio.cli chat --mode offline
+```
+
+Try: `Show acoustic guitars under BRL 1000`, `the first one`, `and with PIX?`,
+`What is your address and opening hours?`, then `exit`.
+
+For an explicitly simulated identity using fictional supplied data:
+
+```bat
+python -m emporio.cli chat --mode offline --demo-customer-id 3
+```
+
+Try `Can I return order 1?`. The assistant queries order and policy, asks for purchase
+channel and actual receipt date, and does not approve eligibility.
+
+## Limits
+
+This is rules/templates, not LLM inference. English output, limited Portuguese input
+aliases. It does not understand arbitrary paraphrases. Follow-ups retain product IDs
+and the last accessible order only, not a full dialogue history. Return eligibility
+is not evaluated from subsequent free-text dates. Model-code and category search are
+supported; brand-only search, general specifications and alternate-product suggestions
+need further work. Simple numeric budget formats only. Policy translations are static
+reviewed templates, checked for page availability against the hash-validated index;
+manual changes require reviewing templates as well as rebuilding the index.
+The demo customer flag is not authentication. No remote service or write action exists.
+
+## Delivery and Git
+
+Extract the complete archive directly into C:\Artefact\artefact-emporio.
+No enclosing folder, Git metadata, credentials, environments or other ZIPs included.
+No deletions required; preserve your local edits before replacing matching files.
+No commit/push was performed here. Existing uncommitted work was preserved.
+
+```bat
 git status
 git diff --stat
 git add -A
-git commit -m "feat: complete catalog order and policy services"
+git commit -m "feat: implement offline conversational assistant"
 ```
 
-Expected Windows result: 30 tests, OK; the revised suite was not run on Windows here.
-If origin is configured, inspect `git branch --show-current` and use
-`git push -u origin HEAD` to push the current branch.
-
-Stop after this checkpoint. After local validation and commit, say NEXT CHECKPOINT
-for the offline conversational assistant (03).
+If origin is configured, `git push -u origin HEAD` pushes the current branch.
+Stop here. After local validation and commit, say NEXT CHECKPOINT to start 04.
