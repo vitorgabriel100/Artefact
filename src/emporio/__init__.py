@@ -1,1 +1,1 @@
-"""Ferramentas verificáveis para o atendimento da Empório da Música."""
+"""Verified support tools for Empório da Música."""

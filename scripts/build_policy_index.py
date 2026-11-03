@@ -1,4 +1,4 @@
-"""Execute na raiz: python scripts/build_policy_index.py (requer pymupdf)."""
+"""Run from the project root: python scripts/build_policy_index.py (requires pymupdf)."""
 import hashlib
 import json
 from pathlib import Path

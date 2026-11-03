@@ -5,3 +5,9 @@ __pycache__/
 .env
 *.db
 .pytest_cache/
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.ruff_cache/
+exports/
+*.zip

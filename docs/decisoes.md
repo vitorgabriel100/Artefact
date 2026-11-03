@@ -1,46 +1,45 @@
-# Decisões e questões abertas
+# Technical decisions and source ambiguities
 
-## Disponibilidade
+This existing filename is retained to avoid leaving an obsolete document when applying
+checkpoint ZIPs. The contents and submitted explanations are in English.
 
-Oferecer para compra somente status `active` com estoque maior que zero.
-Itens `discontinued` ou `coming_soon` não se tornam disponíveis por terem estoque.
-Busca pode retornar indisponíveis quando explicitamente solicitado, com motivo.
+| Decision | Reason | Trade-off |
+|---|---|---|
+| Python and standard-library runtime | Small, inspectable baseline | Some validation is explicit application code |
+| SQLite in memory | Local reproducible relationships and parameterized queries | Reloaded snapshots are not live inventory |
+| Decimal and integer cents | Deterministic monetary calculations | Formatting remains a presentation responsibility |
+| Allowlisted tool functions | Keep data access bounded | Each supported operation needs a declared contract |
+| Lexical PDF retrieval with page references | Adequate starting point for eight pages | Synonyms and multilingual queries need evaluation |
+| CLI first | Meets challenge interface requirements with minimal setup | Customer-friendly dialogue comes in Checkpoint 03 |
+| Optional local LLM later | No mandatory paid credentials | Hardware and model behavior must be checked |
 
-## Preço
+## Availability and promotions
 
-Usar apenas promoções com `is_active=1`. Não inferir vigência pelo nome da campanha:
-o CSV não tem datas. Havendo mais de uma promoção ativa para o mesmo produto,
-recusar carga e exigir revisão; não escolher uma arbitrariamente.
-PIX concede 5% sobre tabela somente quando não houver promoção ativa.
-Preço promocional inclui tabela, percentual e preço final.
-Preços retornados não constituem reserva de estoque ou processamento de compra.
+Only `active` products with positive stock are available. Discontinued products and
+upcoming products remain unavailable even with positive stock. Only `is_active=1`
+promotions apply. No dates exist in the promotion CSV, so no campaign dates are inferred.
+Multiple active promotions for one product fail ingestion rather than selecting one
+arbitrarily. PIX gives 5% off regular prices only when no active promotion applies.
+These calculations do not reserve stock or process purchases.
 
-## Manual
+## Policy ambiguities
 
-- Contatos divergentes: cadastro/capa e seção 7 indicam telefones distintos.
-  Não escolher silenciosamente um contato oficial; explicitar divergência e pedir validação.
-- Parcelamento: tabela geral e seção 3.1 diferem. Ainda não calcular parcelas.
-  Há também ambiguidade na exceção de R$50; solicitar confirmação ao atendimento.
-- Frete local de exatamente R$500 não definido: não afirmar gratuidade nem taxa.
-- Devolução: falta data de recebimento e canal de compra nos pedidos.
-  Previsão de entrega não substitui recebimento efetivo. Consultar informações
-  faltantes e encaminhar casos ambíguos; não emitir aprovação automática.
-- As respostas sobre políticas devem ser atribuídas ao manual fornecido; este
-  protótipo não avalia a validade jurídica das regras do documento.
-- Encaminhamento: não dizer que abriu chamado ou encaminhou reclamação sem
-  existir integração que confirme a ação.
+- Page 2 and page 6 give different phone/WhatsApp contact details. Retrieval includes
+  both for contact questions; a future answer must distinguish source labels and flag
+  uncertainty instead of silently declaring one universally correct.
+- General installment terms and section 3.1 differ; the below-BRL-50 exception is also
+  ambiguous. Installment calculation is not implemented or approved by this checkpoint.
+- The manual does not define the regional shipping fee at exactly BRL 500.
+- Orders have no actual receipt date or purchase channel. Estimated delivery is not
+  receipt. Return eligibility cannot be approved automatically from these records.
+- The manual is the supplied policy source, not an independently reviewed legal opinion.
+- There is no ticketing integration: never claim a complaint was forwarded or a return
+  approved unless an actual integration confirms it.
 
-## Privacidade de pedidos
+## Order privacy boundary
 
-Dados de clientes não devem ir integralmente ao prompt. A futura ferramenta de
-pedidos deve restringir resultados ao cliente associado à sessão. Seleção de
-cliente em uma demo será explicitamente uma simulação, não autenticação real.
-Número de pedido, nome ou e-mail isoladamente não comprovam identidade.
-
-## Limitações desta versão
-
-Sem LLM, autenticação, interface de chat ou consultas de pedido expostas.
-Sem demonstrações conversacionais fabricadas. Busca de políticas lexical com
-sinônimos limitados; resultados precisam ser avaliados e podem omitir contexto.
-Índice textual gerado do PDF: mudança no PDF exige regeneração do índice.
-CSV é snapshot local, sem garantia de atualidade operacional.
+Existing ToolBox code restricts order retrieval to a customer ID supplied by the
+application session, not a model argument. This is a query boundary, **not user
+authentication**. A production identity flow is outside the prototype. Checkpoint 02
+will validate this boundary and choose an explicitly documented demonstration flow.
+Do not expose complete customer lists or accept a name alone as proof of identity.

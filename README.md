@@ -1,61 +1,150 @@
-# Empório da Música — desafio Artefact
+# Artefact Empório Agent
 
-Protótipo em desenvolvimento de um agente de atendimento em Python.
+A Python customer-support prototype for **Empório da Música**, a fictional musical
+instrument store in Campo Grande, Brazil. Developed for the Artefact AI Engineer
+technical challenge.
 
-## Estado desta versão
+## Current status: Checkpoint 01 — Foundation and baseline
 
-Primeira etapa: importação validada dos seis CSVs para SQLite em memória,
-busca de catálogo, cálculo de preços e recuperação textual de políticas.
-A CLI desta etapa demonstra ferramentas; **ainda não é um chatbot com LLM**.
+The deterministic tools work without an API key. This checkpoint provides catalog
+search, verified prices and availability, CSV-to-SQLite ingestion, and policy page
+retrieval. **It is not yet a conversational or LLM-powered assistant.**
 
-## Executar
+Initial session-scoped order tools already exist in `src/emporio/tools.py` from the
+previous development session. Their dedicated validation belongs to Checkpoint 02;
+they are not exposed as a public CLI command or production authentication mechanism.
 
-Python 3.11 ou superior. Na raiz do projeto:
+Read [CHECKPOINT.md](CHECKPOINT.md) for actual validation evidence and changed files.
 
-```bash
+## Requirements and Windows setup
+
+- Python 3.11 or later; development checks use Python 3.12.
+- No runtime dependencies, model downloads or API keys for this checkpoint.
+- Git is needed for your own commits and GitHub publication.
+
+Extract the **contents** of `01-foundation-and-baseline.zip` directly into
+`C:\Artefact\artefact-emporio`. The archive has no enclosing folder and contains no
+`.git` directory. Preserve your existing `.git`, virtual environment and local secrets.
+Back up uncommitted local changes before overwriting matching project files.
+
+In Windows CMD:
+
+```bat
+cd /d C:\Artefact\artefact-emporio
+dir pyproject.toml
 python -m venv .venv
-# Windows PowerShell: .venv\Scripts\Activate.ps1
-# Linux/macOS: source .venv/bin/activate
+.venv\Scripts\activate.bat
 python -m pip install -e .
-emporio catalogo --categoria Violões --maximo 1000
-emporio produto 90 --pagamento pix
-emporio politica "posso devolver uma compra?"
+python -m emporio.cli catalog --category "acoustic guitars" --max-price 1000
 python -m unittest discover -s tests -v
 ```
 
-Não precisa de chave de API nesta etapa. Execute a CLI na raiz ou informe
-`--data /caminho/data` antes do subcomando. Os arquivos são um snapshot fictício:
-consulta ao SQLite não equivale a integração em tempo real com a loja.
+Alternatively, run `setup_windows.bat` to create the virtual environment and install
+the project. `start_windows.bat` displays available commands; it does not start a chat.
 
-## Decisões
+**If pip cannot find `pyproject.toml`, you are in the wrong folder.** The correct
+folder contains `pyproject.toml`, `src`, `data` and `tests` together.
 
-- Python e biblioteca padrão no núcleo: lógica pequena, rastreável e testável.
-- SQLite em memória: relações e consultas parametrizadas, sem servidor.
-- Preços em centavos e Decimal: evitar erro de ponto flutuante.
-- Modelo terá ferramentas específicas, sem SQL livre e sem acesso irrestrito a clientes.
-- PDF preservado; índice textual acompanha página e hash da fonte.
-- Busca textual inicial: baseline simples para um manual pequeno; avaliar recall
-  antes de introduzir embeddings.
-- A interface final prevista é Streamlit; o núcleo não depende dela.
+## Available commands
 
-## Próximas etapas
+```bat
+python -m emporio.cli --help
+python -m emporio.cli catalog --category "acoustic guitars" --max-price 1000
+python -m emporio.cli product 90 --payment pix
+python -m emporio.cli policy "Can I return my purchase?"
+```
 
-1. Integrar LLM com chamadas de ferramentas e limites de execução.
-2. Implementar histórico, persona e consultas de pedidos vinculadas à sessão.
-3. Adicionar interface, tratamento de falhas do provedor e avaliação conversacional.
-4. Registrar 3–5 conversas reais e instruções finais de configuração.
+The original Portuguese commands remain supported:
 
-Veja `docs/decisoes.md` para ambiguidades e limites desta etapa.
+```bat
+python -m emporio.cli catalogo --categoria Violões --maximo 1000
+python -m emporio.cli produto 90 --pagamento pix
+python -m emporio.cli politica "posso devolver uma compra?"
+```
 
-## Uso de IA
+The CLI prints JSON for development inspection. Monetary fields ending in `_cents`
+are integer cent values; `59990` means BRL 599.90. Original product names and policy
+text remain in Portuguese, unchanged from the source. English customer-facing
+conversation will be introduced in later checkpoints.
 
-ChatGPT/Codex auxiliou na análise dos arquivos, proposta de arquitetura,
-implementação inicial e execução dos testes. Esta descrição deve ser atualizada
-durante o desenvolvimento para refletir o workflow efetivamente realizado.
+Data paths resolve relative to the editable installation, not the current terminal
+folder. Override them with `--data PATH` before the subcommand or the operating-system
+variable `EMPORIO_DATA_DIR`. This checkpoint does not read `.env` files.
 
-## Histórico Git
+## Architecture and decisions
 
-O projeto inclui commits locais que registram etapas reais. Ainda não foi publicado
-no GitHub. Preserve o diretório `.git` ao extrair o ZIP. Configure sua identidade
-antes dos seus próprios commits; não é necessário reescrever os commits existentes.
-Após a entrega, não alterar o repositório, conforme o enunciado.
+1. `Catalog` loads the six CSVs into an in-memory SQLite database.
+2. Primary keys, foreign keys, checks and a unique active-promotion index validate
+   structural relationships. Loading fails rather than returning a partial snapshot.
+3. Parameterized queries retrieve products. Python computes discounts with Decimal
+   and integer cents. Availability requires active status and positive stock.
+4. `Policies` searches a prebuilt, hash-checked PDF text index and returns page numbers.
+5. The CLI presents these deterministic results. A future agent will call allowed
+   tools instead of generating unrestricted SQL.
+
+The data is a supplied **snapshot**, not a live store integration. The implementation
+uses all six tables but does not send a customer list to a model.
+
+See [architecture](docs/ARCHITECTURE.md), [decisions](docs/decisoes.md), and
+[checkpoint roadmap](docs/ROADMAP.md).
+
+## Testing
+
+```bat
+python -m unittest discover -s tests -v
+```
+
+The 15 original tests are preserved unchanged. Four additional tests protect English
+and Portuguese CLI compatibility path resolution outside the project directory, and UTF-8 output capture when a legacy
+Windows encoding is inherited.
+Tests require no provider or network. Installation may need network access to obtain
+setuptools if it is not already available.
+
+To regenerate the policy index after intentionally changing the PDF, install the
+optional development dependencies and run from the project root:
+
+```bat
+python -m pip install -e ".[dev]"
+python scripts/build_policy_index.py
+```
+
+Review the regenerated index and rerun tests before committing it.
+
+## Known limitations
+
+- No chat loop, conversation memory, persona or out-of-scope conversational handling yet.
+- No real LLM adapter or live model verification yet. Ollama is the preferred next
+  integration target; no model or hardware availability is assumed.
+- Order tools exist but are not yet covered by dedicated privacy and missing-data tests.
+- Ingestion validates key relationships and basic numeric constraints, but does not yet
+  provide a comprehensive schema/date validation report.
+- Retrieval is lexical and page-based, with a small bilingual vocabulary. There are no
+  embeddings, relevance benchmarks, or guarantees that every phrasing will retrieve well.
+- Policy ambiguities must not be turned into unsupported promises.
+- Only editable source installation is supported; data is not bundled into a standalone wheel.
+- Windows scripts are provided but have not been executed on Windows in this environment.
+
+## AI coding assistant disclosure
+
+OpenAI ChatGPT/Codex assisted with source inspection, implementation suggestions,
+code drafting, debugging, documentation and automated tests. The development process
+uses incremental checkpoints and actual test execution. Candidate review and Windows
+validation are recorded only when confirmed by the candidate. AI-generated code is
+not presented as entirely manually authored.
+
+## Git and delivery
+
+This checkpoint ZIP intentionally excludes Git metadata. It must not replace your
+existing repository history. No commit or push is performed automatically for this
+checkpoint. Review changes, test locally, and commit only the validated changes:
+
+```bat
+git status
+git branch --show-current
+git diff --stat
+git add -A
+git commit -m "chore: establish validated project baseline"
+```
+
+Push to your actual branch and configured remote; see CHECKPOINT.md. Do not upload
+ZIPs, `.env`, or virtual environments. Do not change the repository after submission.

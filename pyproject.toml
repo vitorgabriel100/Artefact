@@ -4,13 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "emporio-agent"
-version = "0.1.0"
-description = "Agente de atendimento da Empório da Música — desafio Artefact"
+version = "0.2.0"
+description = "A grounded music-store assistant for the Artefact AI Engineer challenge"
 requires-python = ">=3.11"
 dependencies = []
+
+[project.optional-dependencies]
+dev = ["ruff>=0.9,<1", "pymupdf>=1.24,<2"]
 
 [project.scripts]
 emporio = "emporio.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
