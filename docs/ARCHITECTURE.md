@@ -1,4 +1,4 @@
-# Architecture — Checkpoint 01
+# Architecture — Checkpoint 02
 
 ## Existing data flow
 
@@ -13,7 +13,7 @@ hash, search indexed pages and return text with source references.
 | `policies.py` | Hash verification and bilingual lexical page retrieval | Baseline tested; broader recall not evaluated |
 | `config.py` | Editable-install data path and environment override | CLI path regression tested |
 | `cli.py` | English commands and legacy aliases | Tested |
-| `tools.py` | Allowlist, parameter validation, session-scoped orders | Existing code; dedicated tests deferred to 02 |
+| `tools.py` | Allowlist, parameter validation, session-scoped orders | Validated: ownership, missing data, input and privacy tests |
 | `scripts/build_policy_index.py` | Rebuild text index from PDF | Existing script, optional PyMuPDF dependency |
 
 ## Intended completion path

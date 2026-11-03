@@ -1,5 +1,6 @@
 """Define allowed tools and validate arguments before accessing source data."""
 
+import math
 from pathlib import Path
 from typing import Any
 
@@ -58,6 +59,8 @@ class ToolBox:
     """Open SQLite per call to avoid sharing connections between sessions."""
 
     def __init__(self, data_dir: Path, customer_id: int | None = None):
+        if customer_id is not None and (type(customer_id) is not int or customer_id <= 0):
+            raise ValueError('Customer session ID must be a positive integer.')
         self.data_dir = Path(data_dir)
         # O identificador vem da configuração da sessão; não faz parte do schema do LLM.
         self.customer_id = customer_id
@@ -107,6 +110,10 @@ class ToolBox:
                 raise ValueError(f'Invalid value for {key}.')
             if isinstance(value, str) and len(value) > 300:
                 raise ValueError(f'{key} is too long.')
+        if 'query' in arguments and not arguments['query'].strip():
+            raise ValueError('Query must not be blank; omit it for a broad product search.')
+        if 'max_price' in arguments and (not math.isfinite(arguments['max_price']) or arguments['max_price'] < 0):
+            raise ValueError('Maximum price must be finite and non-negative.')
         if 'limit' in arguments and not 1 <= arguments['limit'] <= 10:
             raise ValueError('limit must be between 1 and 10.')
         for key in ('order_id', 'product_id'):

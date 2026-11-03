@@ -4,15 +4,15 @@ A Python customer-support prototype for **Empório da Música**, a fictional mus
 instrument store in Campo Grande, Brazil. Developed for the Artefact AI Engineer
 technical challenge.
 
-## Current status: Checkpoint 01 — Foundation and baseline
+## Current status: Checkpoint 02 — Operational services
 
 The deterministic tools work without an API key. This checkpoint provides catalog
 search, verified prices and availability, CSV-to-SQLite ingestion, and policy page
 retrieval. **It is not yet a conversational or LLM-powered assistant.**
 
-Initial session-scoped order tools already exist in `src/emporio/tools.py` from the
-previous development session. Their dedicated validation belongs to Checkpoint 02;
-they are not exposed as a public CLI command or production authentication mechanism.
+Session-scoped order tools are validated with dedicated ownership, missing-data,
+privacy and input-validation tests. They are callable Python services, not a public
+CLI command or production authentication mechanism.
 
 Read [CHECKPOINT.md](CHECKPOINT.md) for actual validation evidence and changed files.
 
@@ -22,7 +22,7 @@ Read [CHECKPOINT.md](CHECKPOINT.md) for actual validation evidence and changed f
 - No runtime dependencies, model downloads or API keys for this checkpoint.
 - Git is needed for your own commits and GitHub publication.
 
-Extract the **contents** of `01-foundation-and-baseline.zip` directly into
+Extract the **contents** of `02-operational-services.zip` directly into
 `C:\Artefact\artefact-emporio`. The archive has no enclosing folder and contains no
 `.git` directory. Preserve your existing `.git`, virtual environment and local secrets.
 Back up uncommitted local changes before overwriting matching project files.
@@ -115,7 +115,7 @@ Review the regenerated index and rerun tests before committing it.
 - No chat loop, conversation memory, persona or out-of-scope conversational handling yet.
 - No real LLM adapter or live model verification yet. Ollama is the preferred next
   integration target; no model or hardware availability is assumed.
-- Order tools exist but are not yet covered by dedicated privacy and missing-data tests.
+- Order authorization filtering is tested; real identity authentication is not implemented.
 - Ingestion validates key relationships and basic numeric constraints, but does not yet
   provide a comprehensive schema/date validation report.
 - Retrieval is lexical and page-based, with a small bilingual vocabulary. There are no
@@ -148,3 +148,5 @@ git commit -m "chore: establish validated project baseline"
 
 Push to your actual branch and configured remote; see CHECKPOINT.md. Do not upload
 ZIPs, `.env`, or virtual environments. Do not change the repository after submission.
+
+Checkpoint 02 adds 11 operational tests: the complete suite now has 30 passing tests.
