@@ -1,7 +1,7 @@
 # Artefact Empório Agent
 
 A Python customer-support prototype for the fictional Empório da Música store.
-**Checkpoint 04:** deterministic offline chat plus an optional Ollama local LLM that
+**Checkpoint 05:** deterministic offline chat plus an optional Ollama local LLM that
 phrases verified tool results. No paid provider key is required. Offline mode remains
 available without Ollama.
 
@@ -104,7 +104,7 @@ See docs/ARCHITECTURE.md, docs/decisoes.md and CHECKPOINT.md for details.
 
 ## Testing and limitations
 
-The complete suite has 48 passing tests on Linux/Python 3.12, including 8 provider
+The complete suite has 49 passing tests on Linux/Python 3.12, including 8 provider
 boundary tests. A real Ollama service/model was not available for live verification in
 the development environment, and Windows validation remains pending. Prompt instructions
 reduce unsupported claims but cannot guarantee model output; review generated answers
@@ -116,7 +116,7 @@ No return approval, payment, reservation or complaint submission is performed.
 
 The default `llama3.2:3b` tag is available in Ollama's model library. Choose a different
 model if your machine needs a smaller one; performance depends on the available hardware.
-Five demonstrations and final submission material follow in checkpoints 05 and 06.
+The [five recorded conversations](examples/) include the tool calls and sources for each scenario. The [manual checklist](docs/MANUAL_QA.md) covers local verification.
 
 ## AI assistant disclosure
 
