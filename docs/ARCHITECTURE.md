@@ -25,8 +25,8 @@ Tool results remain authoritative for prices and availability. The LLM will rece
 selected evidence to produce customer-friendly responses, not a database dump or an
 unrestricted SQL interface. Offline output will be explicitly labeled as deterministic.
 
-The intended path is not implemented yet. No Streamlit application, model connection,
-conversation history or production authentication is claimed in this checkpoint.
+Checkpoint 03 implemented the deterministic offline router and bounded selection context.
+No Streamlit application or production authentication is claimed.
 
 ## Why this is small
 
@@ -47,4 +47,20 @@ The existing order tool filters ownership in SQL and closes its database per cal
 It calls ToolBox and renders exact price strings or reviewed policy templates after
 retrieving the source page. The chat command supports exit, EOF and Ctrl+C.
 The earlier intended-path section records the pre-chat design; offline routing is
-now implemented, while LLM integration and production authentication remain pending.
+implemented. Production authentication remains out of scope.
+
+## Checkpoint 04 local LLM path
+
+`llm_agent.py` runs the existing offline router and captures only the allowlisted tool
+results from the current turn. It passes the customer message, up to three earlier
+exchanges, and those results to `llm.py`. Retrieved policy page text is included only when
+the policy search tool returns it. The model cannot execute tools, SQL, or mutations.
+Its response is a presentation layer; prices, inventory, policies, and order ownership
+remain controlled by Python tools. If no tool produced evidence, the deterministic
+out-of-scope/greeting response is used without invoking the model.
+
+`llm.py` calls Ollama's local `/api/chat` endpoint using `urllib`, JSON, and a bounded
+timeout. There are no extra Python dependencies or API keys. Only localhost HTTP URLs are
+accepted. `LLM_MODEL` defaults to `llama3.2:3b`, but must be downloaded separately. The
+model/service was not available for a live run during this checkpoint; mocked tests cover
+request construction, evidence injection, invalid/empty responses, and connection errors.

@@ -1,69 +1,65 @@
-# Checkpoint 03 — Offline conversational assistant
+# Checkpoint 04 — Grounded local LLM
 
 ## Implemented
 
-Added `src/emporio/chat.py`: deterministic intent routing, readable product prices,
-policy translations with retrieved page references, session product selection and
-last accessible order. Added chat CLI mode and an explicitly simulated customer flag.
-Updated `start_windows.bat` to launch chat. Added `tests/test_chat.py` (10 tests).
-Updated README and architecture. Archived checkpoint 02 in docs/CHECKPOINT_02.md.
-Existing source records and previous 30 tests remain unchanged. No new dependencies.
+Added `src/emporio/llm.py` as a small standard-library client for Ollama's local chat
+API. Added `src/emporio/llm_agent.py` to feed it the customer's current message, a short
+session context, and only verified results from the existing allowlisted tools. Retrieved
+policy excerpts are passed only when returned by the policy search. The model only writes
+customer-facing text; it cannot execute tools, SQL, prices, orders, or store actions.
 
-## Actual validation
+Added the `local-llm` CLI mode and configuration through `LLM_PROVIDER`, `LLM_MODEL`,
+`LLM_BASE_URL`, and `LLM_TIMEOUT`. Offline mode remains the default. Remote endpoints are
+rejected to keep this no-key demo local. No new Python dependency or API key is required.
+Added `tests/test_llm.py` with eight provider and grounding boundary tests. Checkpoint 03
+is preserved in `docs/CHECKPOINT_03.md`.
 
-`python -m unittest discover -s tests -v`: 40 tests, OK, Linux/Python 3.12.
-Tests cover budget search, ambiguous references, first-product selection, PIX follow-up,
-specific/missing models, discontinued stock, policy topics and page references,
-combined order/return requests, order isolation, unsupported requests, input limits,
-and a real CLI subprocess greeting/exit. An initial missing accessories routing term
-was found by the suite and fixed before delivery. Windows execution remains pending.
+## Validation status
 
-## Usage
+`python -m unittest discover -s tests -v`: 48 tests passed on Linux/Python 3.12. The eight
+new provider tests cover
+request construction and timeout, environment configuration, rejection of remote URLs,
+connection errors, invalid/empty responses, verified product/policy context, and no model
+call when the deterministic router retrieves no evidence. A real Ollama installation and
+model were not available for live verification here; Windows execution remains pending.
+
+## Run locally on Windows
+
+Install Ollama and let its local service start. Download the selected model, then run in
+`C:\Artefact\artefact-emporio`:
 
 ```bat
-cd /d C:\Artefact\artefact-emporio
-python -m pip install -e .
+ollama pull llama3.2:3b
+set "LLM_PROVIDER=ollama"
+set "LLM_MODEL=llama3.2:3b"
+set "LLM_BASE_URL=http://localhost:11434"
+set "LLM_TIMEOUT=60"
+python -m emporio.cli chat --mode local-llm
+```
+
+The default model is configurable and is not assumed to be installed. Ollama's local
+HTTP API requires no provider key. The CLI displays an explicit local-model error if the
+service or model is unavailable; it does not silently label offline text as an LLM answer.
+Use `--mode offline` when Ollama is not installed. Run the suite with:
+
+```bat
 python -m unittest discover -s tests -v
-python -m emporio.cli chat --mode offline
 ```
-
-Try: `Show acoustic guitars under BRL 1000`, `the first one`, `and with PIX?`,
-`What is your address and opening hours?`, then `exit`.
-
-For an explicitly simulated identity using fictional supplied data:
-
-```bat
-python -m emporio.cli chat --mode offline --demo-customer-id 3
-```
-
-Try `Can I return order 1?`. The assistant queries order and policy, asks for purchase
-channel and actual receipt date, and does not approve eligibility.
-
-## Limits
-
-This is rules/templates, not LLM inference. English output, limited Portuguese input
-aliases. It does not understand arbitrary paraphrases. Follow-ups retain product IDs
-and the last accessible order only, not a full dialogue history. Return eligibility
-is not evaluated from subsequent free-text dates. Model-code and category search are
-supported; brand-only search, general specifications and alternate-product suggestions
-need further work. Simple numeric budget formats only. Policy translations are static
-reviewed templates, checked for page availability against the hash-validated index;
-manual changes require reviewing templates as well as rebuilding the index.
-The demo customer flag is not authentication. No remote service or write action exists.
 
 ## Delivery and Git
 
-Extract the complete archive directly into C:\Artefact\artefact-emporio.
-No enclosing folder, Git metadata, credentials, environments or other ZIPs included.
-No deletions required; preserve your local edits before replacing matching files.
-No commit/push was performed here. Existing uncommitted work was preserved.
+Extract the complete archive directly into `C:\Artefact\artefact-emporio`, preserving the
+existing `.git` directory and local history. This archive contains no Git metadata,
+credentials, model weights or Python environment. Review the diff, run the tests, then
+commit and push this checkpoint yourself:
 
 ```bat
 git status
 git diff --stat
 git add -A
-git commit -m "feat: implement offline conversational assistant"
+git commit -m "feat: integrate grounded llm response generation"
+git push
 ```
 
-If origin is configured, `git push -u origin HEAD` pushes the current branch.
-Stop here. After local validation and commit, say NEXT CHECKPOINT to start 04.
+This is an integration, not live-model validation. Record a live test only after running
+one question through an installed local model.

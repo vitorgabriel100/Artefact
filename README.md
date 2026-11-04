@@ -1,8 +1,9 @@
 # Artefact Empório Agent
 
 A Python customer-support prototype for the fictional Empório da Música store.
-**Checkpoint 03:** deterministic offline chat and independently tested operational tools.
-No API key, network call or model is required to run the assistant.
+**Checkpoint 04:** deterministic offline chat plus an optional Ollama local LLM that
+phrases verified tool results. No paid provider key is required. Offline mode remains
+available without Ollama.
 
 ## Windows setup
 
@@ -18,6 +19,33 @@ python -m pip install -e .
 python -m unittest discover -s tests -v
 python -m emporio.cli chat --mode offline
 ```
+
+## Optional local LLM
+
+Install Ollama for Windows, start its local service, and download the documented default
+model. The model is configurable; the application does not assume it is installed.
+
+```bat
+ollama pull llama3.2:3b
+set "LLM_PROVIDER=ollama"
+set "LLM_MODEL=llama3.2:3b"
+set "LLM_BASE_URL=http://localhost:11434"
+set "LLM_TIMEOUT=60"
+python -m emporio.cli chat --mode local-llm
+```
+
+The LLM mode contacts only a local HTTP Ollama endpoint. The Python client uses the
+standard library, sends one non-streaming `/api/chat` request per turn with verified tool
+evidence, and does not enable model tool execution. Product/order/policy retrieval still
+runs through the existing deterministic router and allowlisted tools. If that router
+finds no evidence, the assistant returns its deterministic scope response without asking
+the model. A model/service failure is reported explicitly; it is not silently relabelled
+as an LLM answer. Order lookups still require the simulated CLI customer ID.
+
+Set variables in the same Windows terminal before running the command. The project does
+not load `.env` files. `LLM_TIMEOUT` defaults to 60 seconds and can be set from 1 to 180.
+`LLM_BASE_URL` is restricted to localhost so customer messages and demo orders are not
+sent to a remote host. No `LLM_API_KEY` is used or needed for local Ollama.
 
 Alternatively run setup_windows.bat, then start_windows.bat. The batch scripts have
 not been executed on Windows in the development environment.
@@ -76,16 +104,19 @@ See docs/ARCHITECTURE.md, docs/decisoes.md and CHECKPOINT.md for details.
 
 ## Testing and limitations
 
-The complete suite has 40 passing tests in Linux/Python 3.12. Previous 30 tests remain
-unchanged; 10 new tests cover conversation and terminal operation. No live LLM has
-been implemented or tested. Windows validation of this checkpoint is still pending.
+The complete suite has 48 passing tests on Linux/Python 3.12, including 8 provider
+boundary tests. A real Ollama service/model was not available for live verification in
+the development environment, and Windows validation remains pending. Prompt instructions
+reduce unsupported claims but cannot guarantee model output; review generated answers
+before any production use.
 Offline rules support selected phrasing, not general language understanding. Brand-only
 search and arbitrary specification queries are limited. Return follow-ups do not calculate
 eligibility. Unknown facts are not invented. Data is a CSV snapshot, not live inventory.
 No return approval, payment, reservation or complaint submission is performed.
 
-Ollama integration is planned for checkpoint 04, after verifying its setup and hardware
-requirements. Five demonstrations and final submission material follow in 05 and 06.
+The default `llama3.2:3b` tag is available in Ollama's model library. Choose a different
+model if your machine needs a smaller one; performance depends on the available hardware.
+Five demonstrations and final submission material follow in checkpoints 05 and 06.
 
 ## AI assistant disclosure
 
