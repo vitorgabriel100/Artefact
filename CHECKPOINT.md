@@ -1,15 +1,7 @@
-# Checkpoint 05 — Tests and demonstration conversations
+# Checkpoint 06 — Final submission
 
-The five English conversations in [examples](examples/) record actual offline answers, tool arguments and evidence. The return example combines a session-scoped order lookup with page 4 of the store manual. Each scenario starts a new session.
+The README, architecture, decision record and interview guide describe the completed prototype. docs/CHECKPOINT_05.md preserves the preceding checkpoint notes. The setup batch file now describes the actual offline chat. The English submission PDF is in submission/.
 
-The new regression test opens the CLI for each scenario, sends the published customer messages and compares every full answer. The 48 earlier tests remain in the suite.
+For the final audit, install the editable project from the extracted archive, run the suite and replay the examples. The final Linux run passed 49 tests. Live Ollama inference on the candidate workstation remains a manual check. See docs/MANUAL_QA.md.
 
-Validation in Linux with Python 3.12 from the project root:
-
-```sh
-PYTHONPATH="$PWD/src" python -m unittest discover -s tests -v
-```
-
-Result: 49 tests passed. Live Ollama inference and Windows execution were not verified in this run. See the [manual checklist](docs/MANUAL_QA.md) for local verification.
-
-Extract the archive into the parent of the existing artefact-emporio folder. Review the changes and commit this checkpoint separately. Suggested message: `test: expand coverage and add agent demonstrations`.
+Suggested commit: `docs: finalize artefact challenge submission`. After pushing, check that the public repository shows the final README, five examples and PDF. Use the PDF for the recruitment form and the repository URL for the email reply requested in the challenge.
