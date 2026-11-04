@@ -1,9 +1,0 @@
-warning: in the working copy of 'CHECKPOINT.md', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'docs/ARCHITECTURE.md', LF will be replaced by CRLF the next time Git touches it
-warning: in the working copy of 'src/emporio/tools.py', LF will be replaced by CRLF the next time Git touches it
- CHECKPOINT.md        | 169 [32m+++++++++++[m[31m----------------------------------------[m
- README.md            |  14 [32m+++[m[31m--[m
- docs/ARCHITECTURE.md |   4 [32m+[m[31m-[m
- src/emporio/tools.py |   7 [32m+++[m
- 4 files changed, 52 insertions(+), 142 deletions(-)
